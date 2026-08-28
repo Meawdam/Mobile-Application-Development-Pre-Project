@@ -1,19 +1,39 @@
 {
-  "expense": [
+  "expenses": [
     {
-      "id": "1",
+      "id": 1,
       "title": "Dinner",
       "amount": 50.0,
-      "category": "food",
-      "date": "2026-08-28"
+      "category": "🍔",
+      "date": "2026-08-26"
     },
     {
-      "id": "SCLyIDjlBAs",
-      "title": "Game items",
-      "amount": 99,
-      "category": "others",
-      "date": "2026-08-28"
+      "id": 2,
+      "title": "Bus fee",
+      "amount": 15.0,
+      "category": "🚗",
+      "date": "2026-08-25"
+    },
+    {
+      "id": 3,
+      "title": "Lunch",
+      "amount": 60.0,
+      "category": "🍔",
+      "date": "2026-08-26"
+    },
+    {
+      "id": 4,
+      "title": "Shoes",
+      "amount": 200.0,
+      "category": "🛍️",
+      "date": "2026-08-26"
+    },
+    {
+      "id": 5,
+      "title": "Coffee",
+      "amount": 40.0,
+      "category": "🍔",
+      "date": "2026-08-25"
     }
-  ],
-  "$schema": "./node_modules/json-server/schema.json"
+  ]
 }
