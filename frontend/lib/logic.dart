@@ -22,6 +22,9 @@ class Connector {
     }
   }
 
+  double totalExpenses(List<Expense> expenses) {
+    return expenses.fold(0.0, (total, expense) => total + expense.amount);
+  }
 
   // Add a new expense.
   Future<void> addExpense({
