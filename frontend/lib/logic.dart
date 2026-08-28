@@ -21,9 +21,93 @@ class Connector {
       throw Exception('Could not connect to the server.');
     }
   }
+// edit
+    // edit expense
+  Future<void> editTask(
+    String id, {
+    String? newTitle,
+    double? newAmount,
+    ExpenseCategory? newCategory,
+    DateTime? newDate,
+  }) async {
+    try {
+      final headers = {'Content-Type': 'application/json'};
+      final Map<String, dynamic> updateData = {};
+
+      if (newTitle != null && newTitle.isNotEmpty) {
+        updateData['title'] = newTitle;
+      }
+      if (newAmount != null) {
+        updateData['amount'] = newAmount;
+      }
+      if (newCategory != null) {
+        updateData['category'] = newCategory.label;
+      }
+      if (newDate != null) {
+        updateData['date'] =
+            '${newDate.year.toString().padLeft(4, '0')}-${newDate.month.toString().padLeft(2, '0')}-${newDate.day.toString().padLeft(2, '0')}';
+      }
+
+      final body = jsonEncode(updateData);
+      final response = await http.patch(
+        Uri.parse('$baseUrl/$id'),
+        headers: headers,
+        body: body,
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw Exception('Failed to edit task: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+
+  // Filter expense by category
+  Future<List<Expense>> filterExpenses(ExpenseCategory category) async {
+    try {
+      final http.Response res = await http.get(
+        Uri.parse('$baseUrl?category=${category.label}'),
+      );
+      if (res.statusCode != 200) {
+        throw Exception('Failed to load expenses: ${res.statusCode}');
+      }
+      final dynamic decoded = jsonDecode(res.body);
+      final List<dynamic> data = decoded is List ? decoded : const [];
+      return data
+          .map((json) => Expense.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Could not connect to the server or filter expenses.');
+    }
+  }
 
   double totalExpenses(List<Expense> expenses) {
     return expenses.fold(0.0, (total, expense) => total + expense.amount);
+  }
+
+  Future<Expense> searchExpenseByIndex(int index) async {
+    final expenses = await getExpense();
+    if (index < 1 || index > expenses.length) {
+      throw Exception('Index out of range');
+    }
+    return expenses[index - 1];
+  }
+
+  Future<void> deleteExpenseByIndex(int index) async {
+    final expense = await searchExpenseByIndex(index);
+
+    try {
+      final http.Response res = await http.delete(
+        Uri.parse('$baseUrl/${expense.id}'),
+      );
+      if (res.statusCode != 200) {
+        throw Exception('Failed to delete expense: ${res.statusCode}');
+      }
+    } catch (_) {
+      throw Exception('Could not connect to the server.');
+    }
   }
 
   // Add a new expense.

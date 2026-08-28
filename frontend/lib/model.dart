@@ -15,8 +15,10 @@ enum ExpenseCategory {
   }
 
   static ExpenseCategory fromLabel(String value) {
+    final cleanValue = value.trim().toLowerCase();
     return ExpenseCategory.values.firstWhere(
-      (category) => category.label == value.toLowerCase(),
+      (category) =>
+          category.label == cleanValue || category.icon == value.trim(),
       orElse: () => ExpenseCategory.others,
     );
   }
@@ -63,12 +65,12 @@ class Expense {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'amount': amount,
-        'category': category.label,
-        'date': formattedDate,
-      };
+    'id': id,
+    'title': title,
+    'amount': amount,
+    'category': category.label,
+    'date': formattedDate,
+  };
 
   factory Expense.fromJson(Map<String, dynamic> json) {
     return Expense(

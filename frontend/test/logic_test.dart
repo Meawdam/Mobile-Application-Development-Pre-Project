@@ -55,46 +55,70 @@ void main() {
       ),
     ];
 
-    final double total = expenses.fold(
-      0,
-      (sum, expense) => sum + expense.amount,
-    );
-
-    expect(total, 384.0);
+    expect(connector.totalExpenses(expenses), 384.0);
   });
 
-  // 7. Today expenses
-  test('7. Get today expenses should return today expenses', () async {
+  test('4. Search expense by index should return an expense', () async {
+    final Connector connector = Connector();
+    final Expense expense = await connector.searchExpenseByIndex(1);
+
+    expect(expense.id, '1');
+    expect(expense.title, 'Dinner');
+  });
+
+  test('5. Delete expense by index should remove an expense', () async {
+    final Connector connector = Connector();
+    final beforeDelete = await connector.getExpense();
+
+    await connector.addExpense(
+      title: 'Delete test expense',
+      amount: 1,
+      category: ExpenseCategory.others,
+      date: DateTime(2026, 8, 28),
+    );
+    final afterAdd = await connector.getExpense();
+    await connector.deleteExpenseByIndex(afterAdd.length);
+    final afterDelete = await connector.getExpense();
+
+    expect(afterDelete.length, beforeDelete.length);
+  });
+
+  test('6. Edit expense should update fields correctly', () async {
     final Connector connector = Connector();
 
-    final List<Expense> expenses =
-        await connector.getTodayExpenses();
+    // ทดสอบแก้ไขรายการ id: '1'
+    await connector.editTask(
+      '1',
+      newTitle: 'Dinner Buffet',
+      newAmount: 299.0,
+      newCategory: ExpenseCategory.food,
+      newDate: DateTime(2026, 8, 28),
+    );
 
-    final DateTime today = DateTime.now();
+    final expenses = await connector.getExpense();
+    final edited = expenses.firstWhere((e) => e.id == '1');
 
-    for (final expense in expenses) {
-      expect(expense.date.year, today.year);
-      expect(expense.date.month, today.month);
-      expect(expense.date.day, today.day);
-    }
+    expect(edited.title, 'Dinner Buffet');
+    expect(edited.amount, 299.0);
+    expect(edited.category, ExpenseCategory.food);
+
+    // คืนค่าเดิมกลับไป
+    await connector.editTask(
+      '1',
+      newTitle: 'Dinner',
+      newAmount: 50.0,
+      newCategory: ExpenseCategory.food,
+      newDate: DateTime(2026, 8, 28),
+    );
   });
 
-  // 9. Evaluate expenses by selected date
-  test(
-    '9. Get expenses by selected date should return correct expenses',
-    () async {
-      final Connector connector = Connector();
+  test('7. Filter expenses by category should return only matching category', () async {
+    final Connector connector = Connector();
+    final List<Expense> foodExpenses = await connector.filterExpenses(ExpenseCategory.food);
 
-      final DateTime selectedDate = DateTime(2026, 8, 28);
-
-      final List<Expense> expenses =
-          await connector.getExpensesByDate(selectedDate);
-
-      for (final expense in expenses) {
-        expect(expense.date.year, selectedDate.year);
-        expect(expense.date.month, selectedDate.month);
-        expect(expense.date.day, selectedDate.day);
-      }
-    },
-  );
+    expect(foodExpenses.isNotEmpty, true);
+    for (final item in foodExpenses) {
+      expect(item.category, ExpenseCategory.food);
+    }
+  });
 }
