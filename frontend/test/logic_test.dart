@@ -112,6 +112,36 @@ void main() {
     );
   });
 
+  test('6.1 Edit expense partially should only update provided fields', () async {
+    final Connector connector = Connector();
+
+    // ดึงข้อมูลเดิมของ id: '1'
+    final initialExpenses = await connector.getExpense();
+    final initialItem = initialExpenses.firstWhere((e) => e.id == '1');
+
+    // อัปเดตเฉพาะชื่อ (title) อย่างเดียว
+    await connector.editTask('1', newTitle: 'Partial Title Update');
+
+    final updatedExpenses = await connector.getExpense();
+    final updatedItem = updatedExpenses.firstWhere((e) => e.id == '1');
+
+    expect(updatedItem.title, 'Partial Title Update');
+    expect(updatedItem.amount, initialItem.amount);
+    expect(updatedItem.category, initialItem.category);
+
+    // คืนค่าเดิม
+    await connector.editTask('1', newTitle: initialItem.title);
+  });
+
+  test('6.2 Edit non-existing expense should throw exception', () async {
+    final Connector connector = Connector();
+
+    expect(
+      () async => await connector.editTask('non-existing-id-999', newTitle: 'Invalid'),
+      throwsA(isA<Exception>()),
+    );
+  });
+
   test('7. Filter expenses by category should return only matching category', () async {
     final Connector connector = Connector();
     final List<Expense> foodExpenses = await connector.filterExpenses(ExpenseCategory.food);
@@ -120,6 +150,26 @@ void main() {
     for (final item in foodExpenses) {
       expect(item.category, ExpenseCategory.food);
     }
+  });
+
+  test('7.1 Filter expenses for category without matches should return empty list or valid list', () async {
+    final Connector connector = Connector();
+    final List<Expense> results = await connector.filterExpenses(ExpenseCategory.others);
+
+    expect(results, isA<List<Expense>>());
+    for (final item in results) {
+      expect(item.category, ExpenseCategory.others);
+    }
+  });
+
+  test('7.2 ExpenseCategory fromMenuChoice should map correctly and return null for invalid choices', () {
+    expect(ExpenseCategory.fromMenuChoice(1), ExpenseCategory.food);
+    expect(ExpenseCategory.fromMenuChoice(2), ExpenseCategory.transportation);
+    expect(ExpenseCategory.fromMenuChoice(3), ExpenseCategory.shopping);
+    expect(ExpenseCategory.fromMenuChoice(4), ExpenseCategory.others);
+    expect(ExpenseCategory.fromMenuChoice(0), isNull);
+    expect(ExpenseCategory.fromMenuChoice(5), isNull);
+    expect(ExpenseCategory.fromMenuChoice(-1), isNull);
   });
 
   // 7. Today expenses
