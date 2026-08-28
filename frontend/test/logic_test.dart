@@ -81,4 +81,43 @@ void main() {
 
     expect(afterDelete.length, beforeDelete.length);
   });
+
+  test('6. Edit expense should update fields correctly', () async {
+    final Connector connector = Connector();
+
+    // ทดสอบแก้ไขรายการ id: '1'
+    await connector.editTask(
+      '1',
+      newTitle: 'Dinner Buffet',
+      newAmount: 299.0,
+      newCategory: ExpenseCategory.food,
+      newDate: DateTime(2026, 8, 28),
+    );
+
+    final expenses = await connector.getExpense();
+    final edited = expenses.firstWhere((e) => e.id == '1');
+
+    expect(edited.title, 'Dinner Buffet');
+    expect(edited.amount, 299.0);
+    expect(edited.category, ExpenseCategory.food);
+
+    // คืนค่าเดิมกลับไป
+    await connector.editTask(
+      '1',
+      newTitle: 'Dinner',
+      newAmount: 50.0,
+      newCategory: ExpenseCategory.food,
+      newDate: DateTime(2026, 8, 28),
+    );
+  });
+
+  test('7. Filter expenses by category should return only matching category', () async {
+    final Connector connector = Connector();
+    final List<Expense> foodExpenses = await connector.filterExpenses(ExpenseCategory.food);
+
+    expect(foodExpenses.isNotEmpty, true);
+    for (final item in foodExpenses) {
+      expect(item.category, ExpenseCategory.food);
+    }
+  });
 }
