@@ -33,59 +33,13 @@ void main() async {
         await filterExpenses(connector);
         break;
       case '7':
-        try {
-          final List<Expense> expenses = await connector.getTodayExpenses();
-
-          print('\n--- Today Expenses ---');
-
-          if (expenses.isEmpty) {
-            print('No expenses today.');
-          } else {
-            for (var (index, expense) in expenses.indexed) {
-              print('${index + 1}. $expense');
-            }
-          }
-        } catch (e) {
-          print('Error: $e');
-        }
+        await showTodayExpenses(connector);
         break;
       case '8':
         await showTotalExpenses(connector);
         break;
       case '9':
-        try {
-          stdout.write('Enter date (YYYY-MM-DD): ');
-          final String? dateInput = stdin.readLineSync();
-
-          if (dateInput == null || dateInput.isEmpty) {
-            print('Invalid date.');
-            break;
-          }
-
-          final DateTime selectedDate = DateTime.parse(dateInput);
-
-          final List<Expense> expenses = await connector.getExpensesByDate(
-            selectedDate,
-          );
-
-          print('\n--- Expenses on ${dateInput} ---');
-
-          if (expenses.isEmpty) {
-            print('No expenses found on this date.');
-          } else {
-            double total = 0;
-
-            for (var (index, expense) in expenses.indexed) {
-              print('${index + 1}. $expense');
-              total += expense.amount;
-            }
-
-            print('-------------------');
-            print('Total: $total');
-          }
-        } catch (e) {
-          print('Invalid date. Please use YYYY-MM-DD.');
-        }
+        await showExpensesByDate(connector);
         break;
       case '10':
         print('Good bye!');
@@ -312,6 +266,52 @@ Future<void> showTotalExpenses(Connector connector) async {
     final expenses = await connector.getExpense();
     final total = connector.totalExpenses(expenses);
     print('\nTotal Expenses: ${total.toStringAsFixed(2)}');
+  } on Exception catch (e) {
+    print('Error: $e');
+  }
+}
+
+Future<void> showTodayExpenses(Connector connector) async {
+  try {
+    final expenses = await connector.getTodayExpenses();
+    print('\n--- Today Expenses ---');
+
+    if (expenses.isEmpty) {
+      print('No expenses today.');
+      return;
+    }
+
+    for (var (index, expense) in expenses.indexed) {
+      print('${index + 1}. $expense');
+    }
+  } on Exception catch (e) {
+    print('Error: $e');
+  }
+}
+
+Future<void> showExpensesByDate(Connector connector) async {
+  stdout.write('Enter date (YYYY-MM-DD): ');
+  final dateInput = stdin.readLineSync() ?? '';
+  final selectedDate = DateTime.tryParse(dateInput);
+  if (selectedDate == null) {
+    print('Invalid date. Please use YYYY-MM-DD.');
+    return;
+  }
+
+  try {
+    final expenses = await connector.getExpensesByDate(selectedDate);
+    print('\n--- Expenses on $dateInput ---');
+
+    if (expenses.isEmpty) {
+      print('No expenses found on this date.');
+      return;
+    }
+
+    for (var (index, expense) in expenses.indexed) {
+      print('${index + 1}. $expense');
+    }
+    print('-------------------');
+    print('Total: ${connector.totalExpenses(expenses).toStringAsFixed(2)}');
   } on Exception catch (e) {
     print('Error: $e');
   }
