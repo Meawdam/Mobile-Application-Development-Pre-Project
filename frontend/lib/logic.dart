@@ -4,13 +4,13 @@ import 'package:frontend/model.dart';
 import 'package:http/http.dart' as http;
 
 class Connector {
-  static const baseURL = "http://localhost:3000/expense";
+  static const String baseUrl = 'http://localhost:3000/expense';
 
-  Future<List<Expense>> getTasks() async {
+  Future<List<Expense>> getExpense() async {
     try {
-      final http.Response res = await http.get(Uri.parse(baseURL));
+      final http.Response res = await http.get(Uri.parse(baseUrl));
       if (res.statusCode != 200) {
-        throw Exception('Failed to load tasks: ${res.statusCode}');
+        throw Exception('Failed to load expenses: ${res.statusCode}');
       }
       final dynamic decoded = jsonDecode(res.body);
       final List<dynamic> data = decoded is List ? decoded : const [];
@@ -22,39 +22,45 @@ class Connector {
     }
   }
 
-  // 7. Today expenses
-Future<List<Expense>> getTodayExpenses() async {
-  try {
-    final List<Expense> expenses = await getTasks();
-
-    final DateTime today = DateTime.now();
-
-    return expenses.where((expense) {
-      return expense.date.year == today.year &&
-          expense.date.month == today.month &&
-          expense.date.day == today.day;
-    }).toList();
-  } catch (e) {
-    throw Exception('Could not get today expenses.');
+  double totalExpenses(List<Expense> expenses) {
+    return expenses.fold(0.0, (total, expense) => total + expense.amount);
   }
-}
 
-// 9. Your own menu
-// Summary expenses by category
-Future<Map<ExpenseCategory, double>> getExpenseSummaryByCategory() async {
-  try {
-    final List<Expense> expenses = await getTasks();
-
-    final Map<ExpenseCategory, double> summary = {};
-
-    for (final expense in expenses) {
-      summary[expense.category] =
-          (summary[expense.category] ?? 0) + expense.amount;
+  // Add a new expense.
+  Future<void> addExpense({
+    required String title,
+    required double amount,
+    required ExpenseCategory category,
+    DateTime? date,
+  }) async {
+    final String cleanTitle = title.trim();
+    if (cleanTitle.isEmpty) {
+      throw Exception('Error: Invalid title');
+    }
+    if (amount <= 0) {
+      throw Exception('Error: Invalid amount');
     }
 
-    return summary;
-  } catch (e) {
-    throw Exception('Could not get expense summary.');
+    try {
+      final headers = {'Content-Type': 'application/json'};
+      final expense = Expense(
+        id: '',
+        title: cleanTitle,
+        amount: amount,
+        category: category,
+        date: date ?? DateTime.now(),
+      );
+      final body = jsonEncode(expense.toJson());
+      final http.Response res = await http.post(
+        Uri.parse(baseUrl),
+        headers: headers,
+        body: body,
+      );
+      if (res.statusCode != 201) {
+        throw Exception('Failed to add expense: ${res.statusCode}');
+      }
+    } catch (_) {
+      throw Exception('Could not connect to the server.');
+    }
   }
-}
 }
