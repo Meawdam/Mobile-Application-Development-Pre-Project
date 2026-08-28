@@ -121,4 +121,39 @@ void main() {
       expect(item.category, ExpenseCategory.food);
     }
   });
+
+  // 7. Today expenses
+  test('7. Get today expenses should return today expenses', () async {
+    final Connector connector = Connector();
+
+    final List<Expense> expenses =
+        await connector.getTodayExpenses();
+
+    final DateTime today = DateTime.now();
+
+    for (final expense in expenses) {
+      expect(expense.date.year, today.year);
+      expect(expense.date.month, today.month);
+      expect(expense.date.day, today.day);
+    }
+  });
+
+  // 9. Evaluate expenses by selected date
+  test(
+    '9. Get expenses by selected date should return correct expenses',
+    () async {
+      final Connector connector = Connector();
+
+      final DateTime selectedDate = DateTime(2026, 8, 28);
+
+      final List<Expense> expenses =
+          await connector.getExpensesByDate(selectedDate);
+
+      for (final expense in expenses) {
+        expect(expense.date.year, selectedDate.year);
+        expect(expense.date.month, selectedDate.month);
+        expect(expense.date.day, selectedDate.day);
+      }
+    },
+  );
 }
