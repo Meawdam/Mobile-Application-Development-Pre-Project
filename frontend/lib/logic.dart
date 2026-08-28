@@ -21,4 +21,40 @@ class Connector {
       throw Exception('Could not connect to the server.');
     }
   }
+
+  // 7. Today expenses
+Future<List<Expense>> getTodayExpenses() async {
+  try {
+    final List<Expense> expenses = await getTasks();
+
+    final DateTime today = DateTime.now();
+
+    return expenses.where((expense) {
+      return expense.date.year == today.year &&
+          expense.date.month == today.month &&
+          expense.date.day == today.day;
+    }).toList();
+  } catch (e) {
+    throw Exception('Could not get today expenses.');
+  }
+}
+
+// 9. Your own menu
+// Summary expenses by category
+Future<Map<ExpenseCategory, double>> getExpenseSummaryByCategory() async {
+  try {
+    final List<Expense> expenses = await getTasks();
+
+    final Map<ExpenseCategory, double> summary = {};
+
+    for (final expense in expenses) {
+      summary[expense.category] =
+          (summary[expense.category] ?? 0) + expense.amount;
+    }
+
+    return summary;
+  } catch (e) {
+    throw Exception('Could not get expense summary.');
+  }
+}
 }

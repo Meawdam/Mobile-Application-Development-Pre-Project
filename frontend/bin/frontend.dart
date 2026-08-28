@@ -27,10 +27,41 @@ void main() async {
       case '6':
         break;
       case '7':
+        try {
+          final List<Expense> expenses = await connector.getTodayExpenses();
+
+          print('\n--- Today Expenses ---');
+
+          if (expenses.isEmpty) {
+            print('No expenses today.');
+          } else {
+            for (var (index, expense) in expenses.indexed) {
+              print('${index + 1}. $expense');
+            }
+          }
+        } catch (e) {
+          print('Error: $e');
+        }
         break;
       case '8':
         break;
       case '9':
+        try {
+          final Map<ExpenseCategory, double> summary = await connector
+              .getExpenseSummaryByCategory();
+
+          print('\n--- Expense Summary by Category ---');
+
+          if (summary.isEmpty) {
+            print('No expenses found.');
+          } else {
+            summary.forEach((category, total) {
+              print('${category.icon} ${category.label}: $total');
+            });
+          }
+        } catch (e) {
+          print('Error: $e');
+        }
         break;
       case '10':
         print('Good bye!');
