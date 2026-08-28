@@ -1,5 +1,40 @@
 {
-    "Enxpense" : [{
-        
-    }]
+  "expense": [
+    {
+      "id": "1",
+      "title": "Dinner",
+      "amount": 50,
+      "category": "food",
+      "date": "2026-08-26"
+    },
+    {
+      "id": "2",
+      "title": "Bus fee",
+      "amount": 15,
+      "category": "transportation",
+      "date": "2026-08-25"
+    },
+    {
+      "id": "3",
+      "title": "Lunch",
+      "amount": 60,
+      "category": "food",
+      "date": "2026-08-26"
+    },
+    {
+      "id": "4",
+      "title": "Shoes",
+      "amount": 200,
+      "category": "shopping",
+      "date": "2026-08-26"
+    },
+    {
+      "id": "5",
+      "title": "Coffee",
+      "amount": 40,
+      "category": "food",
+      "date": "2026-08-25"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
