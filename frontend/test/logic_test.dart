@@ -27,4 +27,33 @@ void main() {
     expect(data.last.amount, 99.0);
     expect(data.last.category, ExpenseCategory.others);
   });
+
+  test('3. Total expenses should return the correct amount', () {
+    final Connector connector = Connector();
+    final expenses = [
+      Expense(
+        id: '1',
+        title: 'Dinner',
+        amount: 50,
+        category: ExpenseCategory.food,
+        date: DateTime(2026, 8, 26),
+      ),
+      Expense(
+        id: '2',
+        title: 'Shoes',
+        amount: 200,
+        category: ExpenseCategory.shopping,
+        date: DateTime(2026, 8, 26),
+      ),
+      Expense(
+        id: '3',
+        title: 'Game items',
+        amount: 134,
+        category: ExpenseCategory.others,
+        date: DateTime(2026, 8, 28),
+      ),
+    ];
+
+    expect(connector.totalExpenses(expenses), 384.0);
+  });
 }
