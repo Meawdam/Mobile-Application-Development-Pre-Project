@@ -87,6 +87,11 @@ class Connector {
     return expenses.fold(0.0, (total, expense) => total + expense.amount);
   }
 
+  double averageExpensesInDay(List<Expense> expenses) {
+    if (expenses.isEmpty) return 0.0;
+    return totalExpenses(expenses) / expenses.length;
+  }
+
   Future<Expense> searchExpenseByIndex(int index) async {
     final expenses = await getExpense();
     if (index < 1 || index > expenses.length) {
