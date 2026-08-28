@@ -274,16 +274,17 @@ Future<void> showTotalExpenses(Connector connector) async {
 Future<void> showTodayExpenses(Connector connector) async {
   try {
     final expenses = await connector.getTodayExpenses();
-    print('\n--- Today Expenses ---');
+    print("\n--- Today's Expenses ---");
 
     if (expenses.isEmpty) {
       print('No expenses today.');
       return;
     }
 
-    for (var (index, expense) in expenses.indexed) {
-      print('${index + 1}. $expense');
+    for (final expense in expenses) {
+      print(expense);
     }
+    print('Total for today: ${connector.totalExpenses(expenses).toStringAsFixed(2)}');
   } on Exception catch (e) {
     print('Error: $e');
   }
