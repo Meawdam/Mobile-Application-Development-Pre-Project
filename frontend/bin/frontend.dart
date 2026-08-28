@@ -33,11 +33,59 @@ void main() async {
         await filterExpenses(connector);
         break;
       case '7':
+        try {
+          final List<Expense> expenses = await connector.getTodayExpenses();
+
+          print('\n--- Today Expenses ---');
+
+          if (expenses.isEmpty) {
+            print('No expenses today.');
+          } else {
+            for (var (index, expense) in expenses.indexed) {
+              print('${index + 1}. $expense');
+            }
+          }
+        } catch (e) {
+          print('Error: $e');
+        }
         break;
       case '8':
         await showTotalExpenses(connector);
         break;
       case '9':
+        try {
+          stdout.write('Enter date (YYYY-MM-DD): ');
+          final String? dateInput = stdin.readLineSync();
+
+          if (dateInput == null || dateInput.isEmpty) {
+            print('Invalid date.');
+            break;
+          }
+
+          final DateTime selectedDate = DateTime.parse(dateInput);
+
+          final List<Expense> expenses = await connector.getExpensesByDate(
+            selectedDate,
+          );
+
+          print('\n--- Expenses on ${dateInput} ---');
+
+          if (expenses.isEmpty) {
+            print('No expenses found on this date.');
+          } else {
+            double total = 0;
+
+            for (var (index, expense) in expenses.indexed) {
+              print('${index + 1}. $expense');
+              total += expense.amount;
+            }
+
+            print('-------------------');
+            print('Total: $total');
+          }
+        } catch (e) {
+          print('Invalid date. Please use YYYY-MM-DD.');
+        }
         break;
       case '10':
         print('Good bye!');
@@ -87,7 +135,9 @@ Future<void> addExpense(Connector connector) async {
 
   stdout.write('Enter Date (YYYY-MM-DD) or press Enter for today: ');
   final dateInput = stdin.readLineSync() ?? '';
-  final date = dateInput.isEmpty ? DateTime.now() : DateTime.tryParse(dateInput);
+  final date = dateInput.isEmpty
+      ? DateTime.now()
+      : DateTime.tryParse(dateInput);
   if (date == null) {
     print('Error: Invalid date');
     return;

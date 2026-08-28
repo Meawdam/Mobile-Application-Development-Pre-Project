@@ -147,4 +147,38 @@ class Connector {
       throw Exception('Could not connect to the server.');
     }
   }
+
+   // 7. Today expenses
+  Future<List<Expense>> getTodayExpenses() async {
+    try {
+      final List<Expense> expenses = await getExpense();
+
+      final DateTime today = DateTime.now();
+
+      return expenses.where((expense) {
+        return expense.date.year == today.year &&
+            expense.date.month == today.month &&
+            expense.date.day == today.day;
+      }).toList();
+    } catch (e) {
+      throw Exception('Could not get today expenses.');
+    }
+  }
+
+  // 9. Expenses by selected date
+  Future<List<Expense>> getExpensesByDate(
+    DateTime selectedDate,
+  ) async {
+    try {
+      final List<Expense> expenses = await getExpense();
+
+      return expenses.where((expense) {
+        return expense.date.year == selectedDate.year &&
+            expense.date.month == selectedDate.month &&
+            expense.date.day == selectedDate.day;
+      }).toList();
+    } catch (e) {
+      throw Exception('Could not get expenses by date.');
+    }
+  }
 }
