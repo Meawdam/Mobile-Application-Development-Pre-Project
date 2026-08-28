@@ -39,7 +39,7 @@ void main() async {
         await showTotalExpenses(connector);
         break;
       case '9':
-        await showExpensesByDate(connector);
+        await showAverageExpensesByDate(connector);
         break;
       case '10':
         print('Good bye!');
@@ -60,7 +60,7 @@ void showMenu() {
   print('6. Filter expense by category');
   print('7. Today expenses');
   print('8. Total expenses');
-  print('9. Your own menu');
+  print('9. Average in a day');
   print('10. Exit');
 }
 
@@ -290,7 +290,7 @@ Future<void> showTodayExpenses(Connector connector) async {
   }
 }
 
-Future<void> showExpensesByDate(Connector connector) async {
+Future<void> showAverageExpensesByDate(Connector connector) async {
   stdout.write('Enter date (YYYY-MM-DD): ');
   final dateInput = stdin.readLineSync() ?? '';
   final selectedDate = DateTime.tryParse(dateInput);
@@ -301,18 +301,8 @@ Future<void> showExpensesByDate(Connector connector) async {
 
   try {
     final expenses = await connector.getExpensesByDate(selectedDate);
-    print('\n--- Expenses on $dateInput ---');
-
-    if (expenses.isEmpty) {
-      print('No expenses found on this date.');
-      return;
-    }
-
-    for (var (index, expense) in expenses.indexed) {
-      print('${index + 1}. $expense');
-    }
-    print('-------------------');
-    print('Total: ${connector.totalExpenses(expenses).toStringAsFixed(2)}');
+    final average = connector.averageExpensesInDay(expenses);
+    print('\nAverage expenses on $dateInput: ${average.toStringAsFixed(2)}');
   } on Exception catch (e) {
     print('Error: $e');
   }
