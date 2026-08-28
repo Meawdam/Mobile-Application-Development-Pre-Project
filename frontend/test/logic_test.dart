@@ -52,11 +52,14 @@ void main() {
     expect((await connector.getExpense()).length, beforeDelete.length);
   });
 
-  test('5. Search expense should return an expense by index', () async {
+  test('5. Search expense should return matching expenses', () async {
     final connector = Connector();
-    final expense = await connector.searchExpenseByIndex(1);
+    const query = 'ee';
+    final expenses = await connector.searchExpenseByTitle(query);
 
-    expect(expense, isA<Expense>());
+    for (final expense in expenses) {
+      expect(expense.title.toLowerCase(), contains(query));
+    }
   });
 
   test('6. Filter expense by category should return matching expenses', () async {

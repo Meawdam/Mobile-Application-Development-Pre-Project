@@ -111,6 +111,7 @@ Future<void> addExpense(Connector connector) async {
 }
 
 Future<void> deleteExpense(Connector connector) async {
+  await showExpense(connector);
   stdout.write('Enter expense number to delete: ');
   final index = int.tryParse(stdin.readLineSync() ?? '');
   if (index == null) {
@@ -127,17 +128,21 @@ Future<void> deleteExpense(Connector connector) async {
 }
 
 Future<void> searchExpense(Connector connector) async {
-  stdout.write('Enter expense number to search: ');
-  final index = int.tryParse(stdin.readLineSync() ?? '');
-  if (index == null) {
-    print('Error: Invalid expense number');
-    return;
-  }
+  await showExpense(connector);
+  stdout.write('Enter search query: ');
+  final query = stdin.readLineSync() ?? '';
 
   try {
-    final expense = await connector.searchExpenseByIndex(index);
-    print('\n--- Expense ---');
-    print('$index. $expense');
+    final expenses = await connector.searchExpenseByTitle(query);
+    print('\n--- Search Results ---');
+    if (expenses.isEmpty) {
+      print('No matching expenses found.');
+      return;
+    }
+
+    for (final expense in expenses) {
+      print(expense);
+    }
   } on Exception catch (e) {
     print('Error: $e');
   }
@@ -291,6 +296,7 @@ Future<void> showTodayExpenses(Connector connector) async {
 }
 
 Future<void> showAverageExpensesByDate(Connector connector) async {
+  await showExpense(connector);
   stdout.write('Enter date (YYYY-MM-DD): ');
   final dateInput = stdin.readLineSync() ?? '';
   final selectedDate = DateTime.tryParse(dateInput);

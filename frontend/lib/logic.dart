@@ -100,6 +100,16 @@ class Connector {
     return expenses[index - 1];
   }
 
+  Future<List<Expense>> searchExpenseByTitle(String query) async {
+    final expenses = await getExpense();
+    final searchQuery = query.trim().toLowerCase();
+    if (searchQuery.isEmpty) return expenses;
+
+    return expenses
+        .where((expense) => expense.title.toLowerCase().contains(searchQuery))
+        .toList();
+  }
+
   Future<void> deleteExpenseByIndex(int index) async {
     final expense = await searchExpenseByIndex(index);
 
