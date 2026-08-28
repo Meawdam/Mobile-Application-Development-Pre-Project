@@ -50,20 +50,37 @@ void main() async {
         break;
       case '9':
         try {
-          final Map<ExpenseCategory, double> summary = await connector
-              .getExpenseSummaryByCategory();
+          stdout.write('Enter date (YYYY-MM-DD): ');
+          final String? dateInput = stdin.readLineSync();
 
-          print('\n--- Expense Summary by Category ---');
+          if (dateInput == null || dateInput.isEmpty) {
+            print('Invalid date.');
+            break;
+          }
 
-          if (summary.isEmpty) {
-            print('No expenses found.');
+          final DateTime selectedDate = DateTime.parse(dateInput);
+
+          final List<Expense> expenses = await connector.getExpensesByDate(
+            selectedDate,
+          );
+
+          print('\n--- Expenses on ${dateInput} ---');
+
+          if (expenses.isEmpty) {
+            print('No expenses found on this date.');
           } else {
-            summary.forEach((category, total) {
-              print('${category.icon} ${category.label}: $total');
-            });
+            double total = 0;
+
+            for (var (index, expense) in expenses.indexed) {
+              print('${index + 1}. $expense');
+              total += expense.amount;
+            }
+
+            print('-------------------');
+            print('Total: $total');
           }
         } catch (e) {
-          print('Error: $e');
+          print('Invalid date. Please use YYYY-MM-DD.');
         }
         break;
       case '10':
@@ -114,7 +131,9 @@ Future<void> addExpense(Connector connector) async {
 
   stdout.write('Enter Date (YYYY-MM-DD) or press Enter for today: ');
   final dateInput = stdin.readLineSync() ?? '';
-  final date = dateInput.isEmpty ? DateTime.now() : DateTime.tryParse(dateInput);
+  final date = dateInput.isEmpty
+      ? DateTime.now()
+      : DateTime.tryParse(dateInput);
   if (date == null) {
     print('Error: Invalid date');
     return;
