@@ -22,39 +22,50 @@ class Connector {
     }
   }
 // edit
-  Future<void> editTask(String id, {String? title, double? amount, ExpenseCategory? category, DateTime? date}) async {
+    // edit expense
+  Future<void> editTask(
+    String id, {
+    String? newTitle,
+    double? newAmount,
+    ExpenseCategory? newCategory,
+    DateTime? newDate,
+  }) async {
     try {
       final headers = {'Content-Type': 'application/json'};
       final Map<String, dynamic> updateData = {};
-      if (title != null && title.isNotEmpty) {
-        updateData['title'] = title;
+
+      if (newTitle != null && newTitle.isNotEmpty) {
+        updateData['title'] = newTitle;
       }
-      if (amount != null) {
-        updateData['amount'] = amount;
+      if (newAmount != null) {
+        updateData['amount'] = newAmount;
       }
-      if (category != null) {
-        updateData['category'] = category.label;
+      if (newCategory != null) {
+        updateData['category'] = newCategory.label;
       }
-      if (date != null) {
+      if (newDate != null) {
         updateData['date'] =
-            '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+            '${newDate.year.toString().padLeft(4, '0')}-${newDate.month.toString().padLeft(2, '0')}-${newDate.day.toString().padLeft(2, '0')}';
       }
 
+      final body = jsonEncode(updateData);
       final response = await http.patch(
         Uri.parse('$baseURL/$id'),
         headers: headers,
-        body: jsonEncode(updateData),
+        body: body,
       );
+
       if (response.statusCode != 200 && response.statusCode != 204) {
-        throw Exception('Failed to update expense: ${response.statusCode}');
+        throw Exception('Failed to edit task: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Error updating expense: $e');
+      throw Exception('Error: $e');
     }
   }
 
+
   // Filter expense by category
-  Future<List<Expense>> filterByCategory(ExpenseCategory category) async {
+  Future<List<Expense>> filterExpenses(ExpenseCategory category) async {
     try {
       final http.Response res = await http.get(
         Uri.parse('$baseURL?category=${category.label}'),
