@@ -56,4 +56,29 @@ void main() {
 
     expect(connector.totalExpenses(expenses), 384.0);
   });
+
+  test('4. Search expense by index should return an expense', () async {
+    final Connector connector = Connector();
+    final Expense expense = await connector.searchExpenseByIndex(1);
+
+    expect(expense.id, '1');
+    expect(expense.title, 'Dinner');
+  });
+
+  test('5. Delete expense by index should remove an expense', () async {
+    final Connector connector = Connector();
+    final beforeDelete = await connector.getExpense();
+
+    await connector.addExpense(
+      title: 'Delete test expense',
+      amount: 1,
+      category: ExpenseCategory.others,
+      date: DateTime(2026, 8, 28),
+    );
+    final afterAdd = await connector.getExpense();
+    await connector.deleteExpenseByIndex(afterAdd.length);
+    final afterDelete = await connector.getExpense();
+
+    expect(afterDelete.length, beforeDelete.length);
+  });
 }

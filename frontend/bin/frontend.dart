@@ -23,8 +23,10 @@ void main() async {
       case '3':
         break;
       case '4':
+        await deleteExpense(connector);
         break;
       case '5':
+        await searchExpense(connector);
         break;
       case '6':
         break;
@@ -97,6 +99,39 @@ Future<void> addExpense(Connector connector) async {
       date: date,
     );
     print('Expense added successfully!');
+  } on Exception catch (e) {
+    print('Error: $e');
+  }
+}
+
+Future<void> deleteExpense(Connector connector) async {
+  stdout.write('Enter expense number to delete: ');
+  final index = int.tryParse(stdin.readLineSync() ?? '');
+  if (index == null) {
+    print('Error: Invalid expense number');
+    return;
+  }
+
+  try {
+    await connector.deleteExpenseByIndex(index);
+    print('Expense deleted successfully!');
+  } on Exception catch (e) {
+    print('Error: $e');
+  }
+}
+
+Future<void> searchExpense(Connector connector) async {
+  stdout.write('Enter expense number to search: ');
+  final index = int.tryParse(stdin.readLineSync() ?? '');
+  if (index == null) {
+    print('Error: Invalid expense number');
+    return;
+  }
+
+  try {
+    final expense = await connector.searchExpenseByIndex(index);
+    print('\n--- Expense ---');
+    print('$index. $expense');
   } on Exception catch (e) {
     print('Error: $e');
   }
