@@ -90,7 +90,7 @@ class Connector {
   Future<Expense> searchExpenseByIndex(int index) async {
     final expenses = await getExpense();
     if (index < 1 || index > expenses.length) {
-      throw Exception('Index out of range');
+      throw Exception('Index out of range, not found');
     }
     return expenses[index - 1];
   }
