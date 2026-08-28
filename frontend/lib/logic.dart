@@ -26,6 +26,29 @@ class Connector {
     return expenses.fold(0.0, (total, expense) => total + expense.amount);
   }
 
+  Future<Expense> searchExpenseByIndex(int index) async {
+    final expenses = await getExpense();
+    if (index < 1 || index > expenses.length) {
+      throw Exception('Index out of range');
+    }
+    return expenses[index - 1];
+  }
+
+  Future<void> deleteExpenseByIndex(int index) async {
+    final expense = await searchExpenseByIndex(index);
+
+    try {
+      final http.Response res = await http.delete(
+        Uri.parse('$baseUrl/${expense.id}'),
+      );
+      if (res.statusCode != 200) {
+        throw Exception('Failed to delete expense: ${res.statusCode}');
+      }
+    } catch (_) {
+      throw Exception('Could not connect to the server.');
+    }
+  }
+
   // Add a new expense.
   Future<void> addExpense({
     required String title,
