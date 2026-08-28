@@ -54,7 +54,7 @@ void showMenu() {
 
 Future<void> showExpense(Connector connector) async {
   try {
-    final List<Expense> todos = await connector.getTasks();
+    final List<Expense> todos = await connector.getExpense();
     if (todos.isEmpty) {
       print('\nNo expense found.');
       return;
