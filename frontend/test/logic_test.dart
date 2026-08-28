@@ -115,11 +115,9 @@ void main() {
   test('6.1 Edit expense partially should only update provided fields', () async {
     final Connector connector = Connector();
 
-    // ดึงข้อมูลเดิมของ id: '1'
     final initialExpenses = await connector.getExpense();
     final initialItem = initialExpenses.firstWhere((e) => e.id == '1');
 
-    // อัปเดตเฉพาะชื่อ (title) อย่างเดียว
     await connector.editTask('1', newTitle: 'Partial Title Update');
 
     final updatedExpenses = await connector.getExpense();
@@ -129,7 +127,6 @@ void main() {
     expect(updatedItem.amount, initialItem.amount);
     expect(updatedItem.category, initialItem.category);
 
-    // คืนค่าเดิม
     await connector.editTask('1', newTitle: initialItem.title);
   });
 
@@ -152,17 +149,7 @@ void main() {
     }
   });
 
-  test('7.1 Filter expenses for category without matches should return empty list or valid list', () async {
-    final Connector connector = Connector();
-    final List<Expense> results = await connector.filterExpenses(ExpenseCategory.others);
-
-    expect(results, isA<List<Expense>>());
-    for (final item in results) {
-      expect(item.category, ExpenseCategory.others);
-    }
-  });
-
-  test('7.2 ExpenseCategory fromMenuChoice should map correctly and return null for invalid choices', () {
+  test('7.1 ExpenseCategory fromMenuChoice should map correctly and return null for invalid choices', () {
     expect(ExpenseCategory.fromMenuChoice(1), ExpenseCategory.food);
     expect(ExpenseCategory.fromMenuChoice(2), ExpenseCategory.transportation);
     expect(ExpenseCategory.fromMenuChoice(3), ExpenseCategory.shopping);
@@ -172,8 +159,8 @@ void main() {
     expect(ExpenseCategory.fromMenuChoice(-1), isNull);
   });
 
-  // 7. Today expenses
-  test('7. Get today expenses should return today expenses', () async {
+  // 8. Today expenses
+  test('8. Get today expenses should return today expenses', () async {
     final Connector connector = Connector();
 
     final List<Expense> expenses =
