@@ -50,7 +50,7 @@ class Connector {
 
       final body = jsonEncode(updateData);
       final response = await http.patch(
-        Uri.parse('$baseURL/$id'),
+        Uri.parse('$baseUrl/$id'),
         headers: headers,
         body: body,
       );
@@ -68,7 +68,7 @@ class Connector {
   Future<List<Expense>> filterExpenses(ExpenseCategory category) async {
     try {
       final http.Response res = await http.get(
-        Uri.parse('$baseURL?category=${category.label}'),
+        Uri.parse('$baseUrl?category=${category.label}'),
       );
       if (res.statusCode != 200) {
         throw Exception('Failed to load expenses: ${res.statusCode}');
